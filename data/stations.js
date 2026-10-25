@@ -898,7 +898,7 @@ const tramStations = [
         lat: 49.529183,
         lng: 8.508967,
 
-        lines: ["4"],
+        lines: ["4A"],
 
 
         discovered: false
@@ -908,7 +908,7 @@ const tramStations = [
         lat: 49.526605,
         lng: 8.505593,
 
-        lines: ["4"],
+        lines: ["4A"],
 
 
         discovered: false
@@ -958,7 +958,7 @@ const tramStations = [
         lat: 49.523047,
         lng: 8.501048,
 
-        lines: ["4"],
+        lines: ["4", "4A"],
 
 
         discovered: false
@@ -968,7 +968,7 @@ const tramStations = [
         lat: 49.520868,
         lng: 8.499232,
 
-        lines: ["4"],
+        lines: ["4", "4A"],
 
 
         discovered: false
@@ -978,7 +978,7 @@ const tramStations = [
         lat: 49.515458,
         lng: 8.496308,
 
-        lines: ["4"],
+        lines: ["4", "4A"],
 
 
         discovered: false
@@ -988,7 +988,7 @@ const tramStations = [
         lat: 49.511535,
         lng: 8.493778,
 
-        lines: ["4"],
+        lines: ["4", "4A"],
 
 
         discovered: false
@@ -998,7 +998,7 @@ const tramStations = [
         lat: 49.507551,
         lng: 8.493319,
 
-        lines: ["4"],
+        lines: ["4", "4A"],
 
 
         discovered: false
@@ -1008,7 +1008,7 @@ const tramStations = [
         lat: 49.505649,
         lng: 8.490083,
 
-        lines: ["4"],
+        lines: ["4", "4A"],
 
 
         discovered: false
@@ -1018,7 +1018,7 @@ const tramStations = [
         lat: 49.503004,
         lng: 8.487643,
 
-        lines: ["4"],
+        lines: ["4", "4A"],
 
 
         discovered: false
@@ -1028,7 +1028,7 @@ const tramStations = [
         lat: 49.498606,
         lng: 8.488851,
 
-        lines: ["4", "5", "15"],
+        lines: ["4", "4A", "5", "15"],
 
 
         discovered: false
@@ -1038,7 +1038,7 @@ const tramStations = [
         lat: 49.495919,
         lng: 8.486603,
 
-        lines: ["4", "5", "15"],
+        lines: ["4", "4A", "5", "15"],
 
 
         discovered: false
@@ -1048,7 +1048,7 @@ const tramStations = [
         lat: 49.494653,
         lng: 8.479416,
 
-        lines: ["4"],
+        lines: ["4", "4A"],
 
 
         discovered: false
@@ -1058,7 +1058,7 @@ const tramStations = [
         lat: 49.479320,
         lng: 8.451545,
 
-        lines: ["4", "6", "6A", "7", "9X", "10", "12", "15", "S1", "S2", "S3", "S5", "S6"],
+        lines: ["4", "4A", "6", "6A", "7", "9X", "10", "12", "15", "S1", "S2", "S3", "S5", "S6"],
 
 
         discovered: false
@@ -1068,7 +1068,7 @@ const tramStations = [
         lat: 49.481505,
         lng: 8.448401,
 
-        lines: ["4", "7", "10", "15"],
+        lines: ["4", "4A", "7", "10", "15"],
 
 
         discovered: false
@@ -1078,7 +1078,7 @@ const tramStations = [
         lat: 49.479669,
         lng: 8.444886,
 
-        lines: ["4", "7", "10", "15"],
+        lines: ["4", "4A", "7", "10", "15"],
 
 
         discovered: false
@@ -1088,7 +1088,7 @@ const tramStations = [
         lat: 49.477733,
         lng: 8.441364,
 
-        lines: ["4", "10", "15"],
+        lines: ["4", "4A", "10", "15"],
 
 
         discovered: false
@@ -1098,7 +1098,7 @@ const tramStations = [
         lat: 49.476967,
         lng: 8.434633,
 
-        lines: ["4", "9X", "10", "15", "S1", "S2", "S3", "S5", "S6", "S44"],
+        lines: ["4", "4A", "9X", "10", "15", "S1", "S2", "S3", "S5", "S6", "S44"],
 
 
         discovered: false
@@ -1108,7 +1108,7 @@ const tramStations = [
         lat: 49.483152,
         lng: 8.429331,
 
-        lines: ["4", "9X"],
+        lines: ["4", "4A", "9X"],
 
 
         discovered: false
@@ -1118,7 +1118,7 @@ const tramStations = [
         lat: 49.484272,
         lng: 8.421840,
 
-        lines: ["4"],
+        lines: ["4", "4A"],
 
 
         discovered: false
@@ -1128,7 +1128,7 @@ const tramStations = [
         lat: 49.483612,
         lng: 8.413379,
 
-        lines: ["4"],
+        lines: ["4", "4A"],
 
 
         discovered: false
@@ -1138,7 +1138,7 @@ const tramStations = [
         lat: 49.485592,
         lng: 8.397413,
 
-        lines: ["4"],
+        lines: ["4", "4A"],
 
 
         discovered: false
@@ -1148,7 +1148,7 @@ const tramStations = [
         lat: 49.488269,
         lng: 8.387361,
 
-        lines: ["4"],
+        lines: ["4", "4A"],
 
 
         discovered: false
@@ -1158,7 +1158,7 @@ const tramStations = [
         lat: 49.490983,
         lng: 8.378888,
 
-        lines: ["4"],
+        lines: ["4", "4A"],
 
 
         discovered: false
@@ -1168,7 +1168,7 @@ const tramStations = [
         lat: 49.492652,
         lng: 8.376320,
 
-        lines: ["4", "9X"],
+        lines: ["4", "4A", "9X"],
 
 
         discovered: false
@@ -1178,7 +1178,7 @@ const tramStations = [
         lat: 49.490519,
         lng: 8.370367,
 
-        lines: ["4"],
+        lines: ["4", "4A"],
 
 
         discovered: false
@@ -1188,7 +1188,7 @@ const tramStations = [
         lat: 49.488611, 
         lng: 8.364626,
 
-        lines: ["4", "9X"],
+        lines: ["4", "4A", "9X"],
 
 
         discovered: false
@@ -1198,7 +1198,7 @@ const tramStations = [
         lat: 49.483439,
         lng: 8.354056,
 
-        lines: ["4", "9X"],
+        lines: ["4", "4A", "9X"],
 
 
         discovered: false
@@ -1208,7 +1208,7 @@ const tramStations = [
         lat: 49.478531,
         lng: 8.327701,
 
-        lines: ["4", "9X"],
+        lines: ["4", "4A", "9X"],
 
 
         discovered: false
@@ -1218,7 +1218,7 @@ const tramStations = [
         lat: 49.480137,
         lng: 8.293717,
 
-        lines: ["4", "9X"],
+        lines: ["4", "4A", "9X"],
 
 
         discovered: false
@@ -1228,7 +1228,7 @@ const tramStations = [
         lat: 49.476469,
         lng: 8.289276,
 
-        lines: ["4", "9X"],
+        lines: ["4", "4A", "9X"],
 
 
         discovered: false
@@ -1238,7 +1238,7 @@ const tramStations = [
         lat: 49.466376,
         lng: 8.287566,
 
-        lines: ["4", "9X"],
+        lines: ["4", "4A", "9X"],
 
 
         discovered: false
@@ -1248,7 +1248,7 @@ const tramStations = [
         lat: 49.464071,
         lng: 8.264443,
 
-        lines: ["4", "9X"],
+        lines: ["4", "4A", "9X"],
 
 
         discovered: false
@@ -1258,7 +1258,7 @@ const tramStations = [
         lat: 49.462594,
         lng: 8.255116,
 
-        lines: ["4", "9X"],
+        lines: ["4", "4A", "9X"],
 
 
         discovered: false
@@ -1268,7 +1268,7 @@ const tramStations = [
         lat: 49.458042,
         lng: 8.232084,
 
-        lines: ["4", "9X"],
+        lines: ["4", "4A", "9X"],
 
 
         discovered: false
@@ -1278,7 +1278,7 @@ const tramStations = [
         lat: 49.457977,
         lng: 8.224983,
 
-        lines: ["4", "9X"],
+        lines: ["4", "4A", "9X"],
 
 
         discovered: false
@@ -1288,7 +1288,7 @@ const tramStations = [
         lat: 49.463400,
         lng: 8.184857,
 
-        lines: ["4", "9X"],
+        lines: ["4", "4A", "9X"],
 
 
         discovered: false
@@ -1298,7 +1298,7 @@ const tramStations = [
         lat: 49.461361,
         lng: 8.170501,
 
-        lines: ["4", "9X"],
+        lines: ["4", "4A", "9X"],
 
 
         discovered: false

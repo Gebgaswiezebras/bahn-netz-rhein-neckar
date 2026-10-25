@@ -44,6 +44,11 @@ const transitLines = {
         color: "#E2000A"
     },
 
+    "4A": {
+        type: "tram",
+        color: "#E2000A"
+    },
+
     "5": {
         type: "tram",
         color: "#00965D"
