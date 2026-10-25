@@ -1,0 +1,1819 @@
+/* =====================================================
+   🎨 FARBEN UND GRUNDWERTE (DESIGN-TOKENS)
+   👉 Alle Farben, Rundungen und Schatten an EINER Stelle.
+   👉 Wird hier etwas geändert, ändert sich die ganze Seite.
+   👉 Verwendung im CSS: var(--name), z. B. var(--farbe-akzent)
+===================================================== */
+
+:root {
+    /* Hauptfarbe für Akzente: aktive Buttons, Überschriften, Rahmen */
+    --farbe-akzent: #2b4cdb;
+
+    /* Etwas kräftigere helle Variante: markiert den aktiven Modus.
+       Hebt sich klar vom Weiß ab, bleibt aber dezent. */
+    --farbe-akzent-mittel: #d6e0ff;
+
+    /* Dunkle Schriftfarbe für Überschriften und Text */
+    --farbe-dunkel: #14213d;
+
+    /* Gedämpfte Schriftfarbe für Nebensächliches */
+    --farbe-gedaempft: #6b7389;
+
+    /* Heller Hintergrund (Seitenpanel, Schalter-Leiste) */
+    --farbe-hell: #f4f6fb;
+
+    /* Dünne Trennlinien und Rahmen */
+    --farbe-rand: #e3e7f0;
+
+    /* Einheitliche Rundung für Karten, Buttons, Suchfeld */
+    --radius: 10px;
+
+    /* Weicher Schatten für "schwebende" Elemente */
+    --schatten: 0 4px 16px rgba(20, 33, 61, 0.12);
+
+    /* Kleinerer Schatten für Buttons */
+    --schatten-klein: 0 1px 3px rgba(20, 33, 61, 0.15);
+}
+
+
+body {
+    font-family: "Maven Pro", Arial, Helvetica, sans-serif;
+    margin: 0;
+
+    /* Verhindert, dass die ganze Seite scrollt */
+    overflow: hidden;
+
+    /* Seite als Spalte aufbauen:
+       oben die Überschrift, darunter das Layout.
+       Das Layout nimmt automatisch den RESTLICHEN Platz ein,
+       egal wie hoch die Überschrift gerade ist. */
+    display: flex;
+    flex-direction: column;
+
+    /* Volle Fensterhöhe.
+       100vh als Rückfall für ältere Browser,
+       100dvh berücksichtigt auf Handys die ein-/ausfahrende
+       Adressleiste und ist daher genauer. */
+    height: 100vh;
+    height: 100dvh;
+}
+
+
+/* =====================================================
+   🧭 HAUPTLAYOUT UNTER DER ÜBERSCHRIFT
+   👉 Links Karte, rechts Seitenbereich
+===================================================== */
+
+#layout {
+    display: flex;
+    /* Nimmt den gesamten restlichen Platz unter der Überschrift ein */
+    flex: 1;
+
+    /* Wichtig bei Flexbox: erlaubt dem Bereich, kleiner zu werden
+       als sein Inhalt. Ohne diese Zeile könnte die Karte
+       über den Fensterrand hinausragen. */
+    min-height: 0;
+
+    /* Wichtig:
+       Das Layout darf Hover-Popups nicht abschneiden. */
+    position: relative;
+    overflow: visible;
+
+    /* Liegt über der Überschrift-Ebene,
+       damit Tooltips bei Bedarf darüber sichtbar sein können. */
+    z-index: 100;
+}
+
+
+/* =====================================================
+   🗺 LINKER KARTENBEREICH
+   👉 Enthält Karte, Suchfeld und Modus-Buttons
+===================================================== */
+
+#mapArea {
+    /* Nimmt den gesamten Platz links neben dem Seitenpanel ein */
+    flex: 1;
+    min-width: 0;
+
+    height: 100%;
+    position: relative;
+    box-sizing: border-box;
+
+    /* Die Karte liegt auf einer niedrigeren Ebene als das SidePanel. */
+    z-index: 1;
+}
+
+
+/* =====================================================
+   🗺 LEAFLET-KARTE
+   👉 Karte füllt den linken Bereich komplett aus
+===================================================== */
+
+#karte {
+    width: 100%;
+    height: 100%; /* sehr wichtig für Leaflet */
+}
+
+
+/* =====================================================
+   ℹ️ RECHTER SEITENBEREICH
+   👉 Enthält Fortschritt und Infofeld
+   👉 Liegt über der Karte, damit Hover-Infos sichtbar bleiben
+===================================================== */
+
+#sidePanel {
+    /* Feste, angenehme Breite statt 25 %:
+       auf breiten Bildschirmen nicht zu breit,
+       auf schmalen nicht zu schmal */
+    width: 25%;
+    min-width: 320px;
+    max-width: 420px;
+
+    height: 100%;
+    box-sizing: border-box;
+    padding: 16px;
+
+    /* Heller Hintergrund, auf dem die weißen Karten "schweben" */
+    background: var(--farbe-hell);
+
+    /* Dezente Trennlinie statt dickem blauem Strich */
+    border-left: 1px solid var(--farbe-rand);
+
+    position: relative;
+    z-index: 3000;
+
+    display: flex;
+    flex-direction: column;
+
+    /* Das Panel selbst scrollt nicht, nur die Inhalte darin */
+    overflow: visible;
+}
+
+/* =====================================================
+   ℹ️ INFOFELD
+   👉 Nur dieser Bereich scrollt, nicht das ganze SidePanel
+===================================================== */
+
+#info {
+    margin-top: 15px;
+    box-sizing: border-box;
+
+    /* Das Infofeld soll im Normalmodus den verfügbaren Platz
+       im rechten Sidepanel vollständig nutzen */
+    flex: 1;
+    min-height: 0;
+
+    /* Keine künstliche Begrenzung auf halbe Höhe */
+    max-height: none;
+
+    /* Nur wenn der Inhalt wirklich länger als das Sidepanel ist,
+       wird innerhalb des Infofelds gescrollt */
+    overflow-y: auto;
+}
+
+
+/* =====================================================
+   STATIONSMARKER (PERFORMANCE-VERSION)
+   👉 Ein Marker pro Station, darin ein Raster
+      aus Liniensymbolen
+===================================================== */
+
+/*-----------------------------------------------------
+  Startwert für die Markergröße
+  👉 Wird per JavaScript beim Zoomen überschrieben
+     (updateMarkerSize). Alle Marker innerhalb der
+     Karte erben diesen Wert automatisch.
+-----------------------------------------------------*/
+
+#karte {
+    --marker-size: 7px;
+}
+
+
+/*-----------------------------------------------------
+  Äußeres Marker-Element = Hitbox
+  👉 Unsichtbar, aber anklickbar
+  👉 Zentriert das Raster in der Mitte
+-----------------------------------------------------*/
+
+.station-marker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: transparent;
+    cursor: pointer;
+}
+
+
+/*-----------------------------------------------------
+  Raster für die Liniensymbole
+  👉 --columns kommt aus JavaScript (createStationIcon)
+  👉 Abstand von 1px zwischen den Symbolen
+-----------------------------------------------------*/
+
+.station-marker-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--columns), var(--marker-size));
+    gap: 1px;
+
+    /* Klicks sollen immer beim äußeren Marker ankommen */
+    pointer-events: none;
+}
+
+
+/*-----------------------------------------------------
+  Einzelnes Liniensymbol
+  👉 Normalmodus: in Linienfarbe gefüllt,
+     dünner schwarzer Rand
+-----------------------------------------------------*/
+
+.line-dot {
+    width: var(--marker-size);
+    height: var(--marker-size);
+    box-sizing: border-box;
+
+    background-color: var(--line-color);
+    border: 1px solid black;
+}
+
+
+/* Straßenbahn → Quadrat mit leicht abgerundeten Ecken */
+.line-dot-tram {
+    border-radius: 2px;
+}
+
+
+/* S-Bahn → Kreis */
+.line-dot-sbahn {
+    border-radius: 50%;
+}
+
+
+/*-----------------------------------------------------
+  Quizmodus
+  👉 Rand in Linienfarbe statt schwarz
+-----------------------------------------------------*/
+
+body.quiz-active .line-dot {
+    border: 2px solid var(--line-color);
+}
+
+
+/*-----------------------------------------------------
+  Quizmodus + Station noch nicht entdeckt
+  👉 Weiß gefüllt
+  👉 Sobald JavaScript die Klasse "discovered" setzt,
+     greift diese Regel nicht mehr und das Symbol
+     wird wieder in Linienfarbe gefüllt
+-----------------------------------------------------*/
+
+body.quiz-active .station-marker:not(.discovered) .line-dot {
+    background-color: white;
+}
+
+
+/* =====================================================
+   ÜBERSICHTSSYMBOLE (HERAUSGEZOOMT)
+   👉 Quadrat = alle Tramlinien der Station
+   👉 Kreis   = alle S-Bahn-Linien der Station
+   👉 Farbsegmente kommen aus JavaScript
+      (createSegmentGradient)
+===================================================== */
+
+/* Behälter: Quadrat und Kreis nebeneinander */
+.station-overview {
+    display: flex;
+    align-items: center;
+    gap: 1px;
+
+    /* Klicks sollen beim äußeren Marker ankommen */
+    pointer-events: none;
+}
+
+
+/* Gemeinsame Grundform beider Symbole */
+.overview-symbol {
+    width: var(--marker-size);
+    height: var(--marker-size);
+    box-sizing: border-box;
+
+    /* Dünner schwarzer Rand im Normalmodus.
+       box-shadow statt border, damit die Größe gleich bleibt
+       und der Farbverlauf bis zum Rand reicht. */
+    box-shadow: 0 0 0 1px black;
+
+    /* Nötig für die weiße Mitte im Quiz (siehe unten) */
+    position: relative;
+}
+
+
+/* Straßenbahn → Quadrat mit leicht abgerundeten Ecken */
+.overview-symbol-tram {
+    border-radius: 2px;
+}
+
+
+/* S-Bahn → Kreis */
+.overview-symbol-sbahn {
+    border-radius: 50%;
+}
+
+
+/*-----------------------------------------------------
+  Quizmodus: kein schwarzer Rand
+-----------------------------------------------------*/
+
+body.quiz-active .overview-symbol {
+    box-shadow: none;
+}
+
+
+/*-----------------------------------------------------
+  Quizmodus + noch nicht entdeckt
+  👉 Weiße Fläche über die Mitte legen
+  👉 Übrig bleibt ein farbiger Rahmen
+     (bei mehreren Linien mit Farbsegmenten)
+  👉 Sobald die Station "discovered" ist,
+     verschwindet die weiße Fläche
+-----------------------------------------------------*/
+
+body.quiz-active .station-marker:not(.discovered) .overview-symbol::after {
+    content: "";
+    position: absolute;
+
+    /* 2px Abstand zum Rand → Rahmenbreite */
+    inset: 2px;
+
+    background: white;
+
+    /* Übernimmt die Form: Quadrat bleibt Quadrat,
+       Kreis bleibt Kreis */
+    border-radius: inherit;
+}
+
+
+/* =====================================================
+   UMSCHALTEN ZWISCHEN ÜBERSICHT UND RASTER
+   👉 Gesteuert über die Klasse "zoom-detail" am
+      Kartencontainer (gesetzt in updateMarkerSize)
+===================================================== */
+
+/* Herausgezoomt: Raster ausblenden, Übersicht zeigen */
+#karte:not(.zoom-detail) .station-marker-grid {
+    display: none;
+}
+
+/* Hineingezoomt: Übersicht ausblenden, Raster zeigen */
+#karte.zoom-detail .station-overview {
+    display: none;
+}
+
+
+/* =====================================================
+   S-BAHN-TRANSPARENZ ABHÄNGIG VOM ZOOM
+   👉 Herausgezoomt: S-Bahn deckend
+   👉 Hineingezoomt: S-Bahn leicht durchsichtig
+   👉 Umschaltpunkt ist DETAIL_ZOOM_LEVEL in script.js
+      (gleiche Zoomstufe wie Übersicht ↔ Raster)
+
+   Hinweis:
+   Leaflet gibt der Ebene "sbahnPane" automatisch
+   die Klasse "leaflet-sbahn-pane".
+===================================================== */
+
+.leaflet-sbahn-pane {
+    /* Herausgezoomt: keine Transparenz */
+    opacity: 1;
+
+    /* Weicher Übergang statt hartem Umspringen */
+    transition: opacity 0.3s ease;
+}
+
+/* Hineingezoomt: leichte Transparenz
+   (wirkt auf die ganze Ebene → keine dunkleren
+   Stellen, wo sich S-Bahn-Linien überlagern) */
+#karte.zoom-detail .leaflet-sbahn-pane {
+    opacity: 0.7;
+}
+
+
+/* =====================================================
+   TOOLTIP MIT LINIENSYMBOLEN
+   👉 Tooltip = Etikett, das beim Hovern erscheint
+===================================================== */
+
+/* Stations-Tooltips
+   👉 So schmal wie möglich, aber höchstens 180px breit
+   👉 Lange Namen und viele Liniensymbole brechen um */
+.station-tooltip {
+
+    /* Breite = so breit, wie der Inhalt ohne Umbruch wäre.
+       Ohne diese Zeile würde der Browser den Tooltip so
+       schmal wie möglich machen (Symbole untereinander),
+       weil Leaflets Tooltip-Behälter selbst keine Breite hat. */
+    width: max-content;
+
+    /* ...aber höchstens 180px. Ist der Inhalt breiter,
+       bricht er innerhalb dieser Breite um. */
+    max-width: 180px;
+
+    box-sizing: border-box;
+
+    /* Leaflet verbietet standardmäßig Zeilenumbrüche
+       (white-space: nowrap). Hier wieder erlauben,
+       damit lange Namen nicht aus dem Tooltip ragen. */
+    white-space: normal;
+}
+
+/* Stationsname */
+.tooltip-station-name {
+    font-weight: bold;
+}
+
+/* Liniensymbole unter dem Namen */
+.tooltip-line-symbols {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+    margin-top: 4px;
+
+}
+
+/* Symbole im Tooltip etwas kleiner als im Infofeld */
+.tooltip-line-symbols .line-symbol {
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    font-size: 10px;
+}
+
+
+/* =====================================================
+   📊 PROGRESS UI (KREISE NEBENEINANDER + HOVER-INFOS)
+   👉 GEHÖRT IN style.css
+   👉 ERSETZT DEN ALTEN PROGRESS-BLOCK
+===================================================== */
+
+/* Container für alle Linienkreise */
+#progressContainer {
+    margin: 10px;
+    display: flex;              /* Kreise nebeneinander */
+    flex-wrap: wrap;            /* wenn es zu viele werden: nächste Zeile */
+    gap: 10px;                  /* Abstand zwischen den Kreisen */
+}
+
+/* Einzelner Fortschrittskreis mit Tooltip */
+.progress-line {
+    position: relative;         /* wichtig, damit der Tooltip am Kreis hängt */
+}
+
+/* Äußerer Kreis: zeigt den Fortschritt als farbigen Ring */
+.progress-circle {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+}
+
+/* Innerer Kreis: hier steht die Liniennummer drin */
+.progress-circle-inner {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+
+    background: white;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 13px;
+    font-weight: bold;
+    color: black;
+}
+
+/* Tooltip: standardmäßig unsichtbar */
+.progress-tooltip {
+    display: none;
+
+    position: absolute;
+    left: 50%;
+    bottom: 68px;
+    transform: translateX(-50%);
+
+    background: white;
+    color: black;
+
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+
+    z-index: 5000;
+}
+
+/* Tooltip beim Hover anzeigen */
+.progress-line:hover .progress-tooltip {
+    display: block;
+}
+
+
+/* =====================================================
+   🎉 ANIMATION: LINIE VOLLSTÄNDIG ERRATEN
+   👉 Ergänzung zum bestehenden Progress-CSS
+===================================================== */
+
+/* Wird kurz aktiviert, wenn eine Linie 100% erreicht */
+.progress-circle.line-complete-animation {
+    animation: lineCompletePulse 0.8s ease-out;
+}
+
+/* Pulsierende Abschluss-Animation */
+@keyframes lineCompletePulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+    }
+
+    40% {
+        transform: scale(1.18);
+        box-shadow: 0 0 18px rgba(0, 0, 0, 0.35);
+    }
+
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+    }
+}
+
+
+/* =====================================================
+   📊 TRENNUNG ZWISCHEN TRAM- UND S-BAHN-PROGRESS
+   👉 Ergänzung zum bestehenden Progress-CSS
+===================================================== */
+
+/* Erzwingt einen Zeilenumbruch im Flex-Container */
+.progress-break {
+    flex-basis: 100%;
+    height: 4px;
+}
+
+/* Kleine Überschrift innerhalb der Progress-Anzeige */
+.progress-group-label {
+    flex-basis: 100%;
+    font-size: 11px;
+    font-weight: bold;
+    opacity: 0.7;
+    margin-top: 4px;
+}
+
+
+/* =====================================================
+   🚦 LINIENSYMBOLE
+   👉 Werden in Progress-Circles und im Infofeld genutzt
+===================================================== */
+
+/* Grundform für jedes Liniensymbol */
+.line-symbol {
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    box-sizing: border-box;
+
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 1;
+
+    background: var(--line-color);
+    color: white;
+    border: 2px solid var(--line-color);
+}
+
+/* Straßenbahn-Symbol: eher eckig */
+.line-symbol-tram {
+    border-radius: 0px;
+}
+
+/* S-Bahn-Symbol: rund/pillenförmig */
+.line-symbol-sbahn {
+    border-radius: 999px;
+}
+
+/* Liniensymbole im Infofeld nebeneinander */
+.station-line-symbols {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+
+    margin: 8px 0 12px 0;
+}
+
+/* Liniensymbol innerhalb eines Progress-Circles */
+.progress-circle-inner .line-symbol {
+    min-width: 28px;
+    height: 22px;
+    padding: 0 5px;
+    font-size: 11px;
+}
+
+
+/* =====================================================
+   🔍 SUCHFELD-BEREICH
+   👉 Enthält Input + kurzes Feedback unter dem Input
+===================================================== */
+
+#searchArea {
+    position: absolute;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+
+/* =====================================================
+   💬 SUCH-FEEDBACK
+   👉 Meldung unter dem Eingabefeld
+===================================================== */
+
+#searchFeedback {
+    margin-top: 8px;
+    padding: 6px 10px;
+
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: bold;
+
+    color: white;
+    background: #333;
+
+    display: none;
+}
+
+
+/* Falsche Eingabe */
+#searchFeedback.feedback-error {
+    background: #c62828;
+}
+
+
+/* Bereits gefunden */
+#searchFeedback.feedback-success {
+    background: #2e7d32;
+}
+
+
+/* =====================================================
+   ❌ RÜTTEL-ANIMATION BEI FALSCHER EINGABE
+===================================================== */
+
+#stationseingabe.input-shake {
+    animation: inputShake 0.35s ease;
+}
+
+
+@keyframes inputShake {
+    0% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-6px);
+    }
+
+    50% {
+        transform: translateX(6px);
+    }
+
+    75% {
+        transform: translateX(-4px);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+
+
+/* =====================================================
+   ✅ GEFUNDENE STATIONEN / QUIZ-VERLAUF
+   👉 Im Quizmodus statt des normalen Infofelds
+===================================================== */
+
+#foundHistory {
+    margin-top: 18px;
+    display: none;
+
+    width: 100%;
+    box-sizing: border-box;
+
+    /* Sehr wichtig:
+       Überschrift und Liste sollen untereinander stehen */
+    flex-direction: column;
+
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* Im Quizmodus sichtbar */
+body.quiz-active #foundHistory {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+}
+
+/* Überschrift */
+#foundHistory h3 {
+    display: block;
+    width: 100%;
+
+    margin: 0 0 10px 0;
+    padding: 0;
+
+    font-size: 16px;
+    font-weight: bold;
+
+    flex-shrink: 0;
+}
+
+/* Liste der gefundenen Stationen */
+#foundHistoryList {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+
+    width: 100%;
+    box-sizing: border-box;
+
+    gap: 8px;
+
+    flex: 1;
+    min-height: 0;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    padding: 0 6px 0 0;
+    margin: 0;
+}
+
+/* Einzelner Kasten pro gefundener Station */
+.found-history-item {
+    display: block;
+
+    width: 100%;
+    box-sizing: border-box;
+
+    margin: 0;
+    padding: 8px 10px;
+
+    border-radius: 8px;
+
+    background: #f2f2f2;
+    color: black;
+
+    font-size: 13px;
+
+    flex-shrink: 0;
+}
+
+/* Stationsname */
+.found-history-station-name {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+/* Liniensymbole unter dem Stationsnamen */
+.found-history-line-symbols {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+/* Dunkles Design im Quizmodus */
+body.quiz-active .found-history-item {
+    background: #1c1c1c;
+    color: white;
+    border: 1px solid #333;
+}
+
+
+/* =====================================================
+   ℹ️ NORMALES INFOPANEL: SAUBERE STATIONSANZEIGE
+===================================================== */
+
+.station-info-card {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.station-info-card h2 {
+    margin-top: 0;
+    margin-bottom: 14px;
+}
+
+/* =====================================================
+   ABSCHNITTSÜBERSCHRIFTEN IM INFOFELD
+   👉 z. B. "Linien", "Stationsdaten – S-Bahn",
+      "Benachbarte Stationen"
+   👉 Hellblauer Balken mit kräftigem blauem Rand links,
+      damit sie sich klar vom Inhalt darunter abheben
+===================================================== */
+
+.station-info-section h3 {
+    margin: 0 0 10px 0;
+    padding: 6px 10px;
+
+    /* Hellblauer Hintergrund aus dem Farbsystem */
+    background: var(--farbe-akzent-hell);
+
+    /* Farbiger Streifen links in Akzentfarbe */
+    border-left: 4px solid var(--farbe-akzent);
+    border-radius: 0 6px 6px 0;
+
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--farbe-dunkel);
+    letter-spacing: 0.3px;
+}
+
+
+/*-----------------------------------------------------
+  Kleines Symbol vor der Überschrift
+  👉 Quadrat = Straßenbahn, Kreis = S-Bahn
+     (wie die Marker auf der Karte)
+  👉 Greift nur bei Überschriften mit den Klassen
+     section-tram / section-sbahn
+-----------------------------------------------------*/
+
+.station-info-section h3.section-tram::before,
+.station-info-section h3.section-sbahn::before {
+    content: "";
+    display: inline-block;
+
+    width: 10px;
+    height: 10px;
+    margin-right: 8px;
+
+    /* Symbol in Akzentfarbe */
+    background: var(--farbe-akzent);
+    vertical-align: middle;
+}
+
+/* Straßenbahn → Quadrat */
+.station-info-section h3.section-tram::before {
+    border-radius: 2px;
+}
+
+/* S-Bahn → Kreis */
+.station-info-section h3.section-sbahn::before {
+    border-radius: 50%;
+}
+
+
+/* Mehr Abstand zwischen den Abschnitten,
+   damit jeder Block für sich steht */
+.station-info-section {
+    margin-bottom: 22px;
+}
+
+.station-info-section p {
+    margin: 0;
+    line-height: 1.4;
+}
+
+
+/* =====================================================
+   ℹ️ STATIONSDATEN ALS SAUBERE ZEILEN
+===================================================== */
+
+.station-detail-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.station-detail-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+
+    padding: 7px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.station-detail-label {
+    font-weight: bold;
+}
+
+.station-detail-value {
+    text-align: right;
+}
+
+
+/* =====================================================
+   ℹ️ BENACHBARTE STATIONEN
+===================================================== */
+
+.neighbor-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.neighbor-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+
+    padding: 7px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.neighbor-name {
+    font-weight: bold;
+}
+
+.neighbor-distance {
+    text-align: right;
+    opacity: 0.75;
+}
+
+
+/* =====================================================
+   FAHRRADWEG-FILTER
+===================================================== */
+
+#bikeFilterPanel {
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+#bikeFilterPanel h3 {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+}
+
+#bikeFilterButtons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.bike-filter-button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: 6px 8px;
+    border-radius: 999px;
+
+    border: 1px solid #aaa;
+    background: white;
+    color: black;
+
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.bike-filter-button.active {
+    background: #222;
+    color: white;
+    border-color: #222;
+}
+
+.bike-filter-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+
+/* =====================================================
+   ✅ HÄKCHEN AM FORTSCHRITTSKREIS
+   👉 Erscheint bei jeder vollständig erratenen Linie
+   👉 Bleibt dauerhaft sichtbar (bis zum Quiz-Neustart)
+===================================================== */
+
+.progress-check {
+    /* Sitzt oben rechts am Kreis.
+       .progress-line ist bereits position: relative */
+    position: absolute;
+    top: -4px;
+    right: -4px;
+
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+
+    /* Hintergrund in Linienfarbe (kommt aus JavaScript) */
+    background: var(--line-color);
+    color: white;
+
+    /* Weißer Rand trennt das Häkchen optisch vom Ring */
+    border: 2px solid white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+
+    font-size: 12px;
+    font-weight: bold;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    /* Hover-Tooltip des Kreises soll weiter funktionieren */
+    pointer-events: none;
+}
+
+
+/*-----------------------------------------------------
+  Häkchen "springt" beim ersten Erscheinen auf
+  👉 Nur in dem Moment, in dem die Linie fertig wird
+     (der Kreis hat dann die Klasse line-complete-animation)
+  👉 0.3s Verzögerung → startet, während der Kreis pulsiert
+-----------------------------------------------------*/
+
+.progress-circle.line-complete-animation ~ .progress-check {
+    animation: checkPop 0.5s ease-out 0.3s both;
+}
+
+@keyframes checkPop {
+    0%   { transform: scale(0); }
+    60%  { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+
+/* =====================================================
+   💫 LICHTPULS ENTLANG DER FERTIGEN LINIE
+   👉 Weißer Lichtstreifen mit Leuchten in Linienfarbe
+   👉 --glow-color wird per JavaScript gesetzt
+===================================================== */
+
+.line-complete-pulse {
+    filter:
+        drop-shadow(0 0 4px var(--glow-color))
+        drop-shadow(0 0 10px var(--glow-color));
+
+    pointer-events: none;
+}
+
+/* =====================================================
+   🚋 LINIEN-STECKBRIEFE
+===================================================== */
+
+/* Liniensymbole im Infofeld sind anklickbar */
+#info .line-symbol[data-line] {
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+#info .line-symbol[data-line]:hover {
+    transform: scale(1.12);
+}
+
+
+/* Übersicht: Symbole nebeneinander, umbrechend */
+.line-overview-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* In der Übersicht etwas größere Symbole */
+.line-overview-grid .line-symbol {
+    min-width: 34px;
+    height: 28px;
+    font-size: 14px;
+}
+
+.line-overview-hint {
+    margin: -6px 0 16px 0;
+    font-size: 13px;
+    opacity: 0.7;
+}
+
+
+/* Zurück-Button oben im Steckbrief */
+.line-back-button {
+    margin-bottom: 12px;
+    padding: 4px 10px;
+
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: white;
+
+    font-family: inherit;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.line-back-button:hover {
+    background: var(--farbe-akzent-hell);
+    border-color: var(--farbe-akzent);
+}
+
+
+/* Kopf: großes Liniensymbol + Typ */
+.line-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.line-card-symbol .line-symbol {
+    min-width: 52px;
+    height: 40px;
+    font-size: 20px;
+    padding: 0 10px;
+
+    /* Großes Symbol im Kopf nicht anklickbar machen –
+       man ist ja schon im Steckbrief dieser Linie */
+    pointer-events: none;
+}
+
+.line-card-type {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--farbe-dunkel);
+}
+
+/* Stationspaar unter dem kürzesten/längsten Abstand
+   👉 Eigene Zeile, kleiner und gedämpft, damit die
+      Zahl darüber der Blickfang bleibt */
+.spacing-pair {
+    display: block;
+    margin-top: 2px;
+
+    font-size: 12px;
+    font-weight: normal;
+    color: var(--farbe-gedaempft);
+}
+
+
+/* =====================================================
+   ✨ LINIE "POPPT AUF"
+   👉 Kurzes Leuchten in Linienfarbe, während die
+      Linie per JavaScript kurz dicker wird
+===================================================== */
+
+.line-pop {
+    filter:
+        drop-shadow(0 0 4px var(--glow-color))
+        drop-shadow(0 0 10px var(--glow-color));
+}
+
+
+/* =====================================================
+   📖 ALMANACH
+===================================================== */
+
+/*-----------------------------------------------------
+  Dunkler Hintergrund über der ganzen Seite
+  👉 position: fixed = bleibt fest im Fenster
+  👉 hoher z-index = liegt über Karte und Seitenpanel
+-----------------------------------------------------*/
+
+#almanachOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 6000;
+
+    background: rgba(0, 0, 0, 0.45);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Das HTML-Attribut "hidden" muss Vorrang vor display: flex haben */
+#almanachOverlay[hidden] {
+    display: none;
+}
+
+
+/*-----------------------------------------------------
+  Das Fenster selbst
+-----------------------------------------------------*/
+
+#almanachWindow {
+    width: 100%;
+    max-width: 560px;
+    max-height: 80vh;
+
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+
+/* Kopfzeile mit Titel und Schließen-Button */
+#almanachHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 14px 18px;
+    /* Trennlinie in Akzentfarbe */
+    border-bottom: 2px solid var(--farbe-akzent);
+    flex-shrink: 0;
+}
+
+#almanachHeader h2 {
+    margin: 0;
+    font-size: 20px;
+    color: var(--farbe-dunkel);
+}
+
+#almanachCloseBtn {
+    border: none;
+    background: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+
+#almanachCloseBtn:hover {
+    background: var(--farbe-akzent-hell);
+}
+
+
+/* Inhaltsbereich: scrollt, wenn der Text lang ist */
+#almanachContent {
+    padding: 14px 18px 18px;
+    overflow-y: auto;
+}
+
+
+/*-----------------------------------------------------
+  Aufklappbare Abschnitte
+-----------------------------------------------------*/
+
+.almanach-section {
+    border-bottom: 1px solid #ddd;
+}
+
+.almanach-section:last-child {
+    border-bottom: none;
+}
+
+/* Überschrift des Abschnitts (klickbar) */
+.almanach-section summary {
+    padding: 10px 4px;
+    font-weight: bold;
+    font-size: 15px;
+    color: var(--farbe-dunkel);
+    cursor: pointer;
+}
+
+.almanach-section summary:hover {
+    color: var(--farbe-akzent);
+}
+
+/* Text im Abschnitt */
+.almanach-text {
+    padding: 0 4px 12px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.almanach-text p {
+    margin: 0 0 8px;
+}
+
+.almanach-text ul {
+    margin: 0 0 8px;
+    padding-left: 20px;
+}
+
+.almanach-text li {
+    margin-bottom: 4px;
+}
+
+
+/* =====================================================
+   🏷 KOPFLEISTE
+===================================================== */
+
+#topBar {
+    /* Titel links, Buttons rechts */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    height: 56px;
+    padding: 0 20px;
+    box-sizing: border-box;
+
+    background: white;
+    border-bottom: 1px solid var(--farbe-rand);
+
+    /* Kopfleiste soll nie zusammengedrückt werden */
+    flex-shrink: 0;
+
+    /* Eigene Ebene, damit Hover-Infos aus dem
+       Layout darüber erscheinen können */
+    position: relative;
+    z-index: 10;
+}
+
+#topBar h1 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--farbe-dunkel);
+
+    /* Langer Titel wird bei Platzmangel mit … gekürzt */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+/* Behälter für Schalter + Zusatz-Buttons */
+#controlPanel {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+
+/* =====================================================
+   🔘 SEGMENT-SCHALTER FÜR DIE MODI
+   👉 Eine zusammenhängende Leiste; der aktive Modus
+      ist als weißer Block hervorgehoben
+===================================================== */
+
+.mode-switch {
+    display: flex;
+    gap: 2px;
+    padding: 4px;
+
+    background: var(--farbe-hell);
+    border: 1px solid var(--farbe-rand);
+    border-radius: var(--radius);
+}
+
+#controlPanel .mode-switch button {
+    padding: 6px 14px;
+
+    border: none;
+    border-radius: 7px;
+    background: transparent;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--farbe-gedaempft);
+
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+#controlPanel .mode-switch button:hover {
+    color: var(--farbe-dunkel);
+    background: rgba(255, 255, 255, 0.6);
+}
+
+/* Aktiver Modus: hellblau hinterlegter Block
+   (Klasse active-mode setzt updateModeUI())
+   👉 Hintergrund: --farbe-akzent-mittel – deutlich sichtbar,
+      aber nicht knallig
+   👉 Feiner Rand in Akzentfarbe (halb durchsichtig)
+      grenzt den Block sauber ab */
+#controlPanel .mode-switch button.active-mode {
+    background: var(--farbe-akzent-mittel);
+    color: var(--farbe-akzent);
+    box-shadow: inset 0 0 0 1px rgba(43, 76, 219, 0.25);
+}
+
+
+/* =====================================================
+   🔁 ZUSATZ-BUTTONS (NEUSTART, ALMANACH)
+===================================================== */
+
+.top-actions {
+    display: flex;
+    gap: 6px;
+}
+
+#controlPanel .top-actions button {
+    padding: 6px 12px;
+
+    border: 1px solid var(--farbe-rand);
+    border-radius: 8px;
+    background: white;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--farbe-dunkel);
+
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+#controlPanel .top-actions button:hover {
+    border-color: var(--farbe-akzent);
+    color: var(--farbe-akzent);
+}
+
+
+/* =====================================================
+   🔍 SUCHFELD
+   👉 Weißes, abgerundetes Feld mit Lupe und Schatten,
+      schwebt über der Karte
+===================================================== */
+
+#searchArea {
+    top: 16px;
+}
+
+#stationseingabe {
+    width: 340px;
+    max-width: 70vw;
+    box-sizing: border-box;
+
+    /* Links Platz für die Lupe lassen */
+    padding: 12px 18px 12px 44px;
+
+    border: 2px solid transparent;
+    border-radius: 999px;
+    outline: none;
+
+    /* Lupe als eingebettete Grafik (SVG), links im Feld */
+    background:
+        white
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%236b7389' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E")
+        no-repeat 16px center;
+
+    box-shadow: var(--schatten);
+
+    font-family: inherit;
+    font-size: 15px;
+    color: var(--farbe-dunkel);
+    text-align: left;
+
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+#stationseingabe::placeholder {
+    color: var(--farbe-gedaempft);
+}
+
+/* Beim Hineinklicken: farbiger Rand + leichter Leuchtring */
+#stationseingabe:focus {
+    border-color: var(--farbe-akzent);
+    box-shadow: var(--schatten), 0 0 0 4px var(--farbe-akzent-hell);
+}
+
+/* Im Quiz dauerhaft farbiger Rand,
+   damit klar ist: hier wird geraten */
+body.quiz-active #stationseingabe {
+    border-color: var(--farbe-akzent);
+}
+
+
+/* Feedback-Meldung unter dem Suchfeld passend abrunden */
+#searchFeedback {
+    border-radius: 999px;
+    padding: 6px 14px;
+    box-shadow: var(--schatten-klein);
+}
+
+
+/* =====================================================
+   🗂 KARTEN IM SEITENPANEL
+   👉 Infofeld und Radweg-Filter als weiße,
+      leicht schwebende Karten
+===================================================== */
+
+#info,
+#bikeFilterPanel {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--schatten-klein);
+    padding: 16px;
+}
+
+#bikeFilterPanel {
+    /* Ersetzt die alte Trennlinie unter dem Filter */
+    border-bottom: none;
+    margin-bottom: 14px;
+}
+
+#info {
+    margin-top: 0;
+}
+
+
+/* =====================================================
+   ➕ ZOOM-BUTTONS DER KARTE
+   👉 An den neuen Stil angepasst: ohne harten Rahmen,
+      mit weichem Schatten und Rundung
+===================================================== */
+
+#karte .leaflet-bar {
+    border: none;
+    border-radius: var(--radius);
+    box-shadow: var(--schatten);
+    overflow: hidden;
+}
+
+#karte .leaflet-bar a {
+    color: var(--farbe-dunkel);
+    border-bottom-color: var(--farbe-rand);
+}
+
+#karte .leaflet-bar a:hover {
+    background: var(--farbe-akzent-hell);
+    color: var(--farbe-akzent);
+}
+
+/* =====================================================
+   AUTOMATISCHE NACHBARSTATIONEN IM INFOFELD
+===================================================== */
+
+/* Unterüberschrift "Straßenbahn" / "S-Bahn" */
+.auto-neighbor-group h4 {
+    margin: 10px 0 4px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--farbe-gedaempft);
+}
+
+/* Eine Zeile: Name | Liniensymbole | Entfernung */
+.auto-neighbor-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--farbe-rand);
+}
+
+/* Letzte Zeile ohne Trennlinie */
+.auto-neighbor-item:last-child {
+    border-bottom: none;
+}
+
+/* Name nimmt den freien Platz ein */
+.auto-neighbor-name {
+    flex: 1;
+    color: var(--farbe-dunkel);
+}
+
+/* Liniensymbole etwas kleiner und dicht nebeneinander */
+.auto-neighbor-lines {
+    display: flex;
+    gap: 3px;
+    transform: scale(0.85);
+}
+
+/* Entfernung rechtsbündig, Ziffern gleich breit */
+.auto-neighbor-distance {
+    min-width: 52px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    color: var(--farbe-akzent);
+    font-weight: 600;
+}
+
+/* =====================================================
+   🔎 STATIONSFILTER
+   👉 Karte im Seitenpanel mit Filterknöpfen
+   👉 Nicht passende Stationen werden abgedunkelt
+===================================================== */
+
+/* Gleiche weiße Karte wie Infofeld und Radweg-Filter */
+#stationFilterPanel {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--schatten-klein);
+    padding: 16px;
+    margin-bottom: 14px;
+}
+
+#stationFilterPanel h3 {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    color: var(--farbe-dunkel);
+}
+
+/* Abstand zwischen den Gruppen */
+.filter-group {
+    margin-bottom: 10px;
+}
+
+/* Kleine Gruppenüberschrift, z. B. "BAHNSTEIGGLEISE" */
+.filter-group-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--farbe-gedaempft);
+    margin-bottom: 5px;
+}
+
+/* Knöpfe nebeneinander, bei Platzmangel nächste Zeile */
+.filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+/* Ein einzelner Filterknopf (Pillenform) */
+.filter-chip {
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--farbe-rand);
+    background: var(--farbe-hell);
+    color: var(--farbe-dunkel);
+    font-family: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.filter-chip:hover {
+    border-color: var(--farbe-akzent);
+}
+
+/* Aktiver Knopf: gleiche Optik wie der aktive Modus oben */
+.filter-chip.active {
+    background: var(--farbe-akzent-mittel);
+    border-color: var(--farbe-akzent);
+    color: var(--farbe-akzent);
+    font-weight: 600;
+}
+
+/* "Keine Angabe" etwas zurückhaltender (gestrichelt, kursiv) */
+.filter-chip-none {
+    border-style: dashed;
+    font-style: italic;
+}
+
+/* Fußzeile: links Hinweistext, rechts Zurücksetzen */
+.filter-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 6px;
+    padding-top: 8px;
+    border-top: 1px solid var(--farbe-rand);
+}
+
+#stationFilterInfo {
+    font-size: 12px;
+    color: var(--farbe-gedaempft);
+}
+
+/* Trefferzahl in Akzentfarbe hervorheben */
+#stationFilterInfo strong {
+    color: var(--farbe-akzent);
+}
+
+/* Zurücksetzen als schlichter Textknopf */
+#stationFilterReset {
+    border: none;
+    background: none;
+    color: var(--farbe-akzent);
+    font-family: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 0;
+    white-space: nowrap;
+}
+
+#stationFilterReset:hover {
+    text-decoration: underline;
+}
+
+
+/* -----------------------------------------------------
+   ABDUNKELN AUF DER KARTE
+   -----------------------------------------------------
+   Wirkt nur, wenn der Kartencontainer die Klasse
+   "station-filter-active" hat. Die setzt script.js
+   nur im Normalmodus und bei aktivem Filter.
+----------------------------------------------------- */
+
+/* Weiche Überblendung beim An- und Ausschalten */
+.station-marker {
+    transition: opacity 0.2s, filter 0.2s;
+}
+
+/* Nicht passende Stationen: blass und grau,
+   aber weiterhin anklickbar */
+#karte.station-filter-active .station-marker.filter-dimmed {
+    opacity: 0.18;
+    filter: grayscale(1);
+}
+
+/* =====================================================
+   📂 EINKLAPPBARE PANELS
+   👉 Gilt für Radweg-Filter und Stationsfilter
+   👉 Klick auf die Überschrift klappt auf/zu
+===================================================== */
+
+/* Überschrift als klickbare Kopfzeile:
+   Text links, Zähler und Pfeil rechts */
+.collapsible-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;   /* Text wird beim Klicken nicht markiert */
+}
+
+/* Leichte Rückmeldung beim Darüberfahren */
+.collapsible-header:hover {
+    color: var(--farbe-akzent);
+}
+
+/* Sichtbarer Rahmen bei Tastaturbedienung (Tab) */
+.collapsible-header:focus-visible {
+    outline: 2px solid var(--farbe-akzent);
+    outline-offset: 3px;
+    border-radius: 4px;
+}
+
+/* Pfeil ganz rechts, dreht sich beim Einklappen */
+.collapse-arrow {
+    margin-left: auto;
+    font-size: 14px;
+    color: var(--farbe-gedaempft);
+    transition: transform 0.2s;
+}
+
+/* Zähler "2 aktiv" als kleine Plakette */
+.panel-badge {
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: var(--farbe-akzent-mittel);
+    color: var(--farbe-akzent);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+
+/* -----------------------------------------------------
+   EINGEKLAPPTER ZUSTAND
+----------------------------------------------------- */
+
+/* Alles außer der Überschrift verstecken.
+   "#sidePanel" davor macht die Regel stärker als ID-Regeln
+   wie "#bikeFilterButtons { display: flex; }". Sonst würden
+   solche Bereiche beim Einklappen sichtbar bleiben. */
+#sidePanel .collapsible-panel.collapsed > :not(.collapsible-header) {
+    display: none;
+}
+
+/* Panel wird zur schmalen Leiste */
+.collapsible-panel.collapsed {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+/* Überschrift ohne Abstand nach unten */
+.collapsible-panel.collapsed .collapsible-header {
+    margin-bottom: 0;
+}
+
+/* Pfeil zeigt nach rechts statt nach unten */
+.collapsible-panel.collapsed .collapse-arrow {
+    transform: rotate(-90deg);
+}

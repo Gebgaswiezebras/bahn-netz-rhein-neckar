@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <!-- =====================================================
+         GRUNDEINSTELLUNGEN DER WEBSEITE
+    ===================================================== -->
+
+    <!--
+        Sorgt dafür, dass Umlaute und Sonderzeichen korrekt angezeigt werden.
+    -->
+    <meta charset="UTF-8">
+
+    <!--
+        Sorgt dafür, dass die Webseite auf unterschiedlichen
+        Bildschirmgrößen korrekt skaliert wird.
+    -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Meine Bahnkarte</title>
+
+    <!-- =====================================================
+         🔤 SCHRIFTART "MAVEN PRO" VON GOOGLE FONTS
+         👉 preconnect baut die Verbindung zum Server
+            schon vorab auf → Schrift lädt schneller
+         👉 display=swap: Text erscheint sofort in Arial
+            und wechselt, sobald Maven Pro geladen ist
+    ===================================================== -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Maven+Pro:wght@400;700&display=swap">
+
+    <!-- =====================================================
+         🗺 LEAFLET CSS
+         👉 Feste Version 1.9.4, damit ein späteres
+            Leaflet-Update die Seite nicht plötzlich verändert
+         👉 Muss VOR style.css stehen, damit deine eigenen
+            Regeln die Leaflet-Standards überschreiben können
+    ===================================================== -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+    <!-- =====================================================
+         🎨 EIGENES CSS
+         👉 Kommt zuletzt → hat bei Konflikten Vorrang
+    ===================================================== -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- =====================================================
+     🏷 SEITENTITEL
+     👉 Liegt außerhalb von #layout, damit er über die gesamte Breite geht
+===================================================== -->
+<!-- =====================================================
+     🏷 KOPFLEISTE
+     👉 Links der Titel, rechts die Modus-Schalter und
+        die Zusatz-Buttons (Neustart, Almanach)
+     👉 Die IDs der Buttons sind unverändert, damit
+        script.js weiterhin alles findet
+===================================================== -->
+<header id="topBar">
+
+    <h1>Mein Verkehrsnetz Rhein-Neckar</h1>
+
+    <div id="controlPanel">
+
+        <!-- Segment-Schalter: genau ein Modus ist aktiv -->
+        <div class="mode-switch">
+            <button id="normalModeBtn">🔍 Normal</button>
+            <button id="linesModeBtn">🚋 Linien</button>
+            <button id="quizModeBtn">🎮 Quiz</button>
+        </div>
+
+        <!-- Zusatz-Buttons -->
+        <div class="top-actions">
+            <button id="restartQuizBtn" style="display:none;">🔁 Neustart</button>
+            <button id="almanachBtn">📖 Almanach</button>
+        </div>
+
+    </div>
+
+</header>
+
+
+<!-- =====================================================
+     🧭 HAUPTLAYOUT
+     👉 Darunter: links Karte, rechts Info/Progress
+===================================================== -->
+<div id="layout">
+
+    <!-- =====================================================
+         🗺 LINKER BEREICH: KARTE + OVERLAY-ELEMENTE
+         👉 Nimmt 75% der Breite ein
+    ===================================================== -->
+    <div id="mapArea">
+
+        <!-- =====================================================
+     📖 ALMANACH-FENSTER
+     👉 Liegt über der ganzen Seite, anfangs unsichtbar
+     👉 Inhalt wird per JavaScript aus data/almanach.js gefüllt
+===================================================== -->
+<div id="almanachOverlay" hidden>
+
+    <div id="almanachWindow" role="dialog" aria-labelledby="almanachTitle">
+
+        <div id="almanachHeader">
+            <h2 id="almanachTitle">📖 Almanach</h2>
+            <button id="almanachCloseBtn" type="button" aria-label="Schließen">✕</button>
+        </div>
+
+        <div id="almanachContent">
+            <!-- Wird per JavaScript gefüllt -->
+        </div>
+
+    </div>
+
+</div>
+
+        <!-- =====================================================
+     🔍 SUCHFELD + FEEDBACK
+     👉 Feedback erscheint nur kurz nach Eingaben im Quizmodus
+===================================================== -->
+
+<div id="searchArea">
+
+    <input id="stationseingabe" placeholder="Station eingeben">
+
+    <div id="searchFeedback"></div>
+
+</div>
+
+        <!-- =====================================================
+             🗺 LEAFLET-KARTE
+        ===================================================== -->
+        <div id="karte"></div>
+
+    </div>
+
+
+   <!-- =====================================================
+     ℹ️ RECHTER BEREICH: PROGRESS + INFOS
+     👉 Nimmt 25% der Breite ein
+===================================================== -->
+<div id="sidePanel">
+
+     <div id="bikeFilterPanel">
+    <h3>Fahrradwege</h3>
+    <div id="bikeFilterButtons"></div>
+</div>
+
+    <!-- =====================================================
+         🔎 STATIONSFILTER
+         👉 Hebt Stationen nach Gleisen, Haltestellenart
+            oder Anzeiger hervor (nur im Normalmodus)
+         👉 Die Knöpfe werden per JavaScript erzeugt
+            (siehe renderStationFilterPanel in script.js)
+    ===================================================== -->
+    <div id="stationFilterPanel">
+        <h3>Stationsfilter</h3>
+
+        <!-- Hier landen die Gruppen mit ihren Knöpfen -->
+        <div id="stationFilterGroups"></div>
+
+        <!-- Fußzeile: Trefferzahl + Zurücksetzen -->
+        <div class="filter-footer">
+            <span id="stationFilterInfo"></span>
+            <button id="stationFilterReset" type="button">Zurücksetzen</button>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         📊 PROGRESS-ANZEIGEN
+         👉 Werden im Quizmodus angezeigt
+    ===================================================== -->
+    <div id="progressContainer"></div>
+    <div id="totalProgress"></div>
+
+
+    <!-- =====================================================
+         ✅ GEFUNDENE STATIONEN IM QUIZMODUS
+         👉 Wird nur im Quizmodus angezeigt
+    ===================================================== -->
+    <div id="foundHistory">
+        <h3>Gefundene Stationen</h3>
+
+        <div id="foundHistoryList">
+            <!-- Wird per JavaScript gefüllt -->
+        </div>
+    </div>
+
+
+    <!-- =====================================================
+         ℹ️ NORMALES INFOFELD
+         👉 Wird im Normalmodus angezeigt
+    ===================================================== -->
+    <div id="info">
+        <h2>Informationen</h2>
+        <p>Hier werden später Informationen angezeigt.</p>
+    </div>
+
+</div>
+
+</div>
+
+
+<!--
+    Leaflet in fester Version 1.9.4 (passend zum CSS oben).
+    leaflet-providers wird nicht mehr gebraucht, weil die
+    CARTO-Karte jetzt direkt mit API-Key eingebunden ist.
+-->
+
+<!-- 1. Leaflet in fester Version -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+
+<!-- =====================================================
+     📦 SCRIPTS
+     👉 Reihenfolge ist wichtig:
+        1. Leaflet (Kartenbibliothek)
+        2. Daten (werden von script.js benutzt)
+        3. script.js (Programmlogik)
+===================================================== -->
+
+<!-- 2. Reine Daten – enthalten keine Logik -->
+<script src="data/lines.js"></script>
+<script src="data/stations.js"></script>
+<script src="data/tracks.js"></script>
+<script src="data/bikes.js"></script>
+<script src="data/almanach.js"></script>
+
+<!-- 3. Programmlogik -->
+<script src="script.js"></script>
+
+</body>
+</html>
